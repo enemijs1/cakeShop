@@ -6,6 +6,7 @@ class AppState {
         shape: null,
         amountOfPeople: null,
         suggestedWeight: null,
+        buildType: null,
     }];
 
     constructor() {
@@ -16,6 +17,10 @@ class AppState {
 
     @action changeShape(event) {
         this.cakeSettings.shape = event.target.value;
+    }
+
+    @action changeBuildType(type) {
+      this.cakeSettings.buildType = type;
     }
 
     @action changeAmountOfPeople(event) {
