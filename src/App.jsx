@@ -1,41 +1,36 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { action, computed, observable } from 'mobx'
 import DevTools from 'mobx-react-devtools';
 
-import BuildType from './components/BuildType';
+import styles from './style.css';
+
+import BuildType from './components/BuildType/BuildType';
+import Preview from './components/Preview/Preview';
+import Shape from './components/Shape';
+import Amount from './components/Amount';
 import DefinedCakes from './DefinedCakes';
 
 @observer
 class App extends Component {
   render() {
-     const {cakeSettings, timer} = this.props.appState;
+     const {cakeSettings, timer, preview} = this.props.appState;
      const state =  this.props.appState;
 
     return (
-      <div>
+      <div className={styles.background}>
+      {state.error}
 
+      {this.getPreview}
       {cakeSettings.buildType === 'standart' && <DefinedCakes/> }
 
       <BuildType onClick={this.chooseType}/>
       {cakeSettings.buildType == 'custom' &&
         <div>
-          <select onChange={this.onChangeShape}>
-                <option value="">Choose Shape of your cacke</option>
-                <option value="square">square</option>
-                <option value="circle">circle</option>
-                <option value="heart">heart</option>
-            </select>
+          <Shape onChange={this.onChangeShape} />
 
             {cakeSettings.shape &&
-                <select onChange={this.onChangeAmountPeople}>
-                    <option value="">Choose how many people will eat his cacke</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="15">15</option>
-                    <option value="20">20</option>
-                    <option value="25">25</option>
-                    <option value="30">30</option>
-                </select>
+                <Amount onChange={this.onChangeAmountPeople} />
             }
           </div>
         }
@@ -45,11 +40,11 @@ class App extends Component {
                   {cakeSettings.shape &&
                       <div>Shape: <b>{cakeSettings.shape} </b> <br/></div>
                   }
-                  {cakeSettings.shape && cakeSettings.amountOfPeople &&
+                  {cakeSettings.shape &&
                       <div>
                           How many will eat: <b> {cakeSettings.amountOfPeople} </b><br/>
                           <div>How many kg should I get?:</div> <b> {cakeSettings.suggestedWeight} </b><br/>
-                          <input type="text" onChange={this.onChangeAmountPeople} value={cakeSettings.amountOfPeople} />
+                          {this.inputAmount}
                           <div>Chosen Type::</div> <b> {cakeSettings.buildType} </b><br/>
                       </div>
                   }
@@ -61,10 +56,26 @@ class App extends Component {
     );
   }
 
+  @computed get inputAmount() {
+    return(
+      <input type="text" onChange={this.onChangeAmountPeople} />
+    );
+  }
+
+  @computed get getPreview() {
+    const {cakeSettings, timer, preview} = this.props.appState;
+
+    const cakeSettingsShape = cakeSettings.shape;
+    console.log('asd', this.props.appState.cakeSettingsShape);
+    // return(
+    //   <Preview src={this.props.appState.preview.shape.cakeSettingsShape} />
+    // );
+  }
+
   chooseType = (event) => {
     const type = event.target.dataset.type;
 
-        this.props.appState.changeBuildType(type);
+    this.props.appState.changeBuildType(type);
   }
 
   onChangeShape = (event) => {
@@ -73,7 +84,6 @@ class App extends Component {
 
   onChangeAmountPeople = (event) => {
       this.props.appState.changeAmountOfPeople(event);
-      this.props.appState.suggestHowManyKg(event.target.value);
   }
 };
 
